@@ -78,7 +78,7 @@ struct PSInput
 	float4 pos:SV_Position;
 	float4 colour:COLOUR0;
 // Something missing here...
-
+	float4 originalPos:POSITION;
 };
 
 struct PSOutput
@@ -89,6 +89,8 @@ struct PSOutput
 // This gets called for every vertex which needs to be transformed
 void VSMain(const VSInput input, out PSInput output)
 {
+	output.originalPos = input.pos;
+
 	output.pos = mul(input.pos, g_WVP);
 
 	// You also need to pass through the untransformed world position to the PS
@@ -104,12 +106,19 @@ void PSMain(const PSInput input, out PSOutput output)
 	output.colour = input.colour;
 
 	// Transform the pixel into light space
+	float4 lightSpace = mul(input.originalPos, g_shadowMatrix);
 
 	// Perform perspective correction
+	float4 perspective = lightSpace / lightSpace.w;
 
 	// Scale and offset uvs into 0-1 range.
+	float2 UV = { perspective.x , -perspective.y};
 
 	// Sample render target to see if this pixel is in shadow
 
 	// If it is then alpha blend between final colour and shadow colour
+	float4 red = { 1,0,0,1 };
+	if (all(g_shadowTexture.Sample(g_shadowSampler, UV) == red)) {
+		output.colour = lerp(input.colour, g_shadowColour, g_shadowColour.a);
+	}
 }
