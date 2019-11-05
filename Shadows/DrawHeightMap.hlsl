@@ -112,7 +112,7 @@ void PSMain(const PSInput input, out PSOutput output)
 	float4 perspective = lightSpace / lightSpace.w;
 
 	// Scale and offset uvs into 0-1 range.
-	float2 UV = { perspective.x , -perspective.y};
+	float2 UV = { (perspective.x + 1) * 0.5 , 1 - ((perspective.y + 1) * 0.5)};
 
 	// Sample render target to see if this pixel is in shadow
 
