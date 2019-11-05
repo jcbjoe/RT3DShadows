@@ -118,7 +118,7 @@ void PSMain(const PSInput input, out PSOutput output)
 
 	// If it is then alpha blend between final colour and shadow colour
 	float4 red = { 1,0,0,1 };
-	if (all(g_shadowTexture.Sample(g_shadowSampler, UV) == red)) {
+	if (all(g_shadowTexture.Sample(g_shadowSampler, UV) == red) && lightSpace.w > 0 ) {
 		output.colour = lerp(input.colour, g_shadowColour, g_shadowColour.a);
 	}
 }
